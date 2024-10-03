@@ -1,0 +1,16 @@
+.header {
+  height: 130px;
+  border-bottom: 6px solid rgb(182, 244, 146);
+
+  .chip {
+    text-decoration: none;
+    background: linear-gradient(to right, rgb(182, 244, 146), rgb(51, 139, 147));
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.1);
+      transition: 0.3s;
+    }
+  }
+}
