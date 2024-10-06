@@ -1,0 +1,19 @@
+.character {
+  width: 580px;
+  height: 340px;
+  background-color: #353535;
+  color: #d0f0c0;
+
+  .alive {
+    color: rgb(18, 121, 18);
+  }
+
+  .dead {
+    color: rgb(155, 10, 10);
+  }
+
+  .character-icon {
+    width: 300px;
+    height: 300px;
+  }
+}

@@ -11,7 +11,7 @@ class App extends Component<AppProps> {
 
     const categoryQuery = new URLSearchParams(location.search).get('category');
 
-    if (!categoryQuery) window.location.href = '/?category=Characters'; //set category equales to Character
+    if (!categoryQuery) window.location.href = '/?category=Characters'; //set category default equales to Character
   }
 
   render() {
