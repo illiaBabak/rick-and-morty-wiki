@@ -3,9 +3,7 @@ import { Header } from 'src/components/Header';
 import Main from 'src/components/Main';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-interface AppProps extends RouteComponentProps {}
-
-class App extends Component<AppProps> {
+class App extends Component<RouteComponentProps> {
   componentDidMount(): void {
     const { location } = this.props;
 

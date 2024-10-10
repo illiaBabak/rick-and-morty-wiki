@@ -3,7 +3,7 @@ import { CHIPS } from 'src/utils/constants';
 import { Link } from 'react-router-dom';
 
 export class Header extends Component {
-  render() {
+  render(): JSX.Element {
     return (
       <div className='header d-flex flex-column justify-content-center align-items-center w-100 text-white'>
         <h1>Rick and Morty wiki</h1>
