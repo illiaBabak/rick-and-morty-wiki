@@ -13,6 +13,7 @@ import {
 } from 'src/utils/constants';
 import { Episode } from '../Episode';
 import { Loader } from '../Loader';
+import { Filters } from '../Filters';
 
 const loadData = async (category: string, pageNumber: number) => {
   const response = await fetch(
@@ -29,6 +30,7 @@ interface State {
   category: (typeof CHIPS)[number];
   isLoading: boolean;
   initialized: boolean;
+  hasFilters: boolean;
   charactersData: {
     characters: CharacterType[];
     page: number;
@@ -48,6 +50,7 @@ class Main extends Component<RouteComponentProps> {
     category: 'Characters',
     isLoading: false,
     initialized: true,
+    hasFilters: false,
     charactersData: {
       characters: [],
       page: 0,
@@ -109,11 +112,56 @@ class Main extends Component<RouteComponentProps> {
     return parsedData;
   }
 
+  useFilteredData = (filteredData: CharacterType[] | LocationType[] | EpisodeType[]): void => {
+    if (isCharacterArr(filteredData)) {
+      this.setState({
+        hasFilters: true,
+        charactersData: {
+          characters: filteredData,
+          page: 0,
+        },
+      });
+    } else if (isLocationArr(filteredData)) {
+      this.setState({
+        hasFilters: true,
+        locationsData: {
+          locations: filteredData,
+          page: 0,
+        },
+      });
+    } else if (isEpisodeArr(filteredData)) {
+      this.setState({
+        hasFilters: true,
+        episodesData: {
+          episodes: filteredData,
+          page: 0,
+        },
+      });
+    }
+  };
+
+  clearFilters = (): void => {
+    this.setState({
+      hasFilters: false,
+      charactersData: {
+        characters: [],
+      },
+      locationsData: {
+        locations: [],
+      },
+      episodesData: {
+        episodes: [],
+      },
+    });
+
+    this.updatePage();
+  };
+
   async updatePage() {
     const { category } = this.state;
     const nextPage = this.getPageByCategory(category) + 1;
 
-    if (category === 'Characters' && this.state.charactersData.page + 1 <= MAX_CHARACTERS_PAGES) {
+    if (category === 'Characters' && nextPage <= MAX_CHARACTERS_PAGES) {
       const newPageData = await this.getCharactersData(nextPage);
 
       this.setState((prev: State) => ({
@@ -122,7 +170,7 @@ class Main extends Component<RouteComponentProps> {
           page: nextPage,
         },
       }));
-    } else if (category === 'Locations' && this.state.locationsData.page + 1 <= MAX_LOCATIONS_PAGES) {
+    } else if (category === 'Locations' && nextPage <= MAX_LOCATIONS_PAGES) {
       const newPageData = await this.getLocationsData(nextPage);
 
       this.setState((prev: State) => ({
@@ -131,7 +179,7 @@ class Main extends Component<RouteComponentProps> {
           page: nextPage,
         },
       }));
-    } else if (category === 'Episodes' && this.state.episodesData.page + 1 <= MAX_EPISODES_PAGES) {
+    } else if (category === 'Episodes' && nextPage <= MAX_EPISODES_PAGES) {
       const newPageData = await this.getEpisodesData(nextPage);
 
       this.setState((prev: State) => ({
@@ -146,8 +194,10 @@ class Main extends Component<RouteComponentProps> {
   }
 
   handleObserver = (el: HTMLElement | null) => {
+    if (this.observer) this.observer.disconnect();
+
     this.observer = new IntersectionObserver((entries) => {
-      if (!entries[0].isIntersecting) return;
+      if (!entries[0].isIntersecting || this.state.hasFilters) return;
 
       this.updatePage();
     }, OBSERVER_OPTIONS);
@@ -162,6 +212,7 @@ class Main extends Component<RouteComponentProps> {
 
     this.setState({
       category,
+      hasFilters: false,
     });
 
     setTimeout(() => {
@@ -203,7 +254,8 @@ class Main extends Component<RouteComponentProps> {
     } = this.state;
 
     return (
-      <div className='main d-flex w-100 flex-grow-1'>
+      <div className='main d-flex w-100 flex-grow-1 flex-column align-items-center'>
+        <Filters category={category} useFilteredData={this.useFilteredData} clearFilters={this.clearFilters} />
         <div className='d-flex flex-row flex-wrap justify-content-around mt-4'>
           {category === 'Characters' &&
             characters?.map((character, index) => (

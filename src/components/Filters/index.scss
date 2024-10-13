@@ -1,0 +1,49 @@
+.filters {
+  background-color: #282932;
+  border: 6px solid rgb(182, 244, 146);
+
+  .field {
+    width: 240px;
+    height: 24px;
+    border: 0;
+    border-radius: 3px;
+
+    &:focus {
+      outline: 0;
+      border: 3px solid rgb(182, 244, 146);
+    }
+  }
+
+  .dropdown-filter {
+    width: 240px;
+    height: 28px;
+    border: 0;
+    background: linear-gradient(to right, rgb(51, 147, 70), rgb(51, 139, 147));
+
+    &:hover {
+      background: linear-gradient(to right, rgb(51, 139, 147), rgb(51, 139, 147));
+    }
+  }
+
+  .btn-wrapper {
+    width: 100px;
+    height: 30px;
+    background: linear-gradient(to right, rgb(182, 244, 146), rgb(51, 139, 147));
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.1);
+      transition: 0.3s;
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+
+      .btn {
+        pointer-events: none;
+      }
+    }
+  }
+}
