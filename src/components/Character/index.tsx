@@ -7,7 +7,7 @@ interface CharacterProps {
 }
 
 export class Character extends Component<CharacterProps> {
-  render() {
+  render(): JSX.Element {
     const { character } = this.props;
 
     return (

@@ -7,7 +7,7 @@ interface EpisodeProps {
 }
 
 export class Episode extends Component<EpisodeProps> {
-  render() {
+  render(): JSX.Element {
     const { episode } = this.props;
 
     return (

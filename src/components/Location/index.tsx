@@ -7,7 +7,7 @@ interface LocationProps {
 }
 
 export class Location extends Component<LocationProps> {
-  render() {
+  render(): JSX.Element {
     const { location } = this.props;
 
     return (

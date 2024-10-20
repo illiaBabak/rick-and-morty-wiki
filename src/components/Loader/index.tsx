@@ -1,7 +1,7 @@
 import { Component } from 'react';
 
 export class Loader extends Component {
-  render() {
+  render(): JSX.Element {
     return (
       <div className='loader position-fixed'>
         <img

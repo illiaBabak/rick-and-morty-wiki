@@ -12,7 +12,7 @@ class App extends Component<RouteComponentProps> {
     if (!categoryQuery) window.location.href = '/?category=Characters'; //set category default equales to Character
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <div className='app-container d-flex justify-content-start flex-column w-100 h-100'>
         <Header />

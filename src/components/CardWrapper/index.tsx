@@ -5,7 +5,7 @@ interface CardWrapperProps {
 }
 
 export class CardWrapper extends Component<CardWrapperProps> {
-  render() {
+  render(): JSX.Element {
     const { children } = this.props;
 
     return <div className='wrapper p-2 m-3'>{children}</div>;

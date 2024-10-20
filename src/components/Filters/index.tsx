@@ -23,6 +23,8 @@ const EPISODES_FILTERS = ['name', 'episode'] as const;
 const CHARACTER_GENDER_OPTIONS = ['Male', 'Female', 'unknown', 'Genderless'] as const;
 const CHARACTER_STATUS_OPTIONS = ['Alive', 'Dead', 'unknown'] as const;
 
+type Filter =  Record<(typeof CHARACTER_FILTERS)[number], string> | Record<(typeof LOCATION_FILTERS)[number], string> | Record<(typeof EPISODES_FILTERS)[number], string>;
+
 const DEFAULT_VAL = {
   characterFilters: {
     name: '',
@@ -57,7 +59,7 @@ interface State {
 export class Filters extends Component<Props> {
   state: State = DEFAULT_VAL;
 
-  getFiltersByCategory(category: (typeof CHIPS)[number]) {
+  getFiltersByCategory(category: (typeof CHIPS)[number]): Filter {
     const filters = {
       Characters: this.state.characterFilters,
       Locations: this.state.locationFilters,
@@ -67,7 +69,7 @@ export class Filters extends Component<Props> {
     return filters[category];
   }
 
-  async getFilteredData(params: string) {
+  async getFilteredData(params: string): Promise<void> {
     const filteredData = await loadDataWithParams(this.props.category, params);
 
     if (isCharacterArr(filteredData) || isLocationArr(filteredData) || isEpisodeArr(filteredData))
@@ -75,7 +77,7 @@ export class Filters extends Component<Props> {
   }
 
   handleSearch(): void {
-    const values = Object.entries(this.getFiltersByCategory(this.props.category)).filter(([_, v]) => v.length);
+    const values = Object.entries(this.getFiltersByCategory(this.props.category)).filter(([, v]) => v.length);
     const params = values.map(([key, val]) => `${key}=${val}`).join('&');
 
     this.getFilteredData(params);
