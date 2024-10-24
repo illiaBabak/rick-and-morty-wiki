@@ -20,18 +20,21 @@ const CHARACTER_FILTERS = ['name', 'status', 'species', 'type', 'gender'] as con
 const LOCATION_FILTERS = ['name', 'type', 'dimension'] as const;
 const EPISODES_FILTERS = ['name', 'episode'] as const;
 
-const CHARACTER_GENDER_OPTIONS = ['Male', 'Female', 'unknown', 'Genderless'] as const;
-const CHARACTER_STATUS_OPTIONS = ['Alive', 'Dead', 'unknown'] as const;
+const CHARACTER_GENDER_OPTIONS = ['Unselected', 'Male', 'Female', 'unknown', 'Genderless'] as const;
+const CHARACTER_STATUS_OPTIONS = ['Unselected', 'Alive', 'Dead', 'unknown'] as const;
 
-type Filter =  Record<(typeof CHARACTER_FILTERS)[number], string> | Record<(typeof LOCATION_FILTERS)[number], string> | Record<(typeof EPISODES_FILTERS)[number], string>;
+type Filter =
+  | Record<(typeof CHARACTER_FILTERS)[number], string>
+  | Record<(typeof LOCATION_FILTERS)[number], string>
+  | Record<(typeof EPISODES_FILTERS)[number], string>;
 
 const DEFAULT_VAL = {
   characterFilters: {
     name: '',
-    status: 'Alive',
+    status: 'Unselected',
     species: '',
     type: '',
-    gender: 'Male',
+    gender: 'Unselected',
   },
   locationFilters: {
     name: '',
@@ -66,7 +69,12 @@ export class Filters extends Component<Props> {
       Episodes: this.state.episodeFilters,
     };
 
-    return filters[category];
+    const selectedFilters = filters[category];
+    const filtersToApply = Object.fromEntries(
+      Object.entries(selectedFilters).filter(([, v]) => v.length && v !== 'Unselected')
+    ) as Filter;
+
+    return filtersToApply;
   }
 
   async getFilteredData(params: string): Promise<void> {
@@ -77,8 +85,8 @@ export class Filters extends Component<Props> {
   }
 
   handleSearch(): void {
-    const values = Object.entries(this.getFiltersByCategory(this.props.category)).filter(([, v]) => v.length);
-    const params = values.map(([key, val]) => `${key}=${val}`).join('&');
+    const values = Object.entries(this.getFiltersByCategory(this.props.category));
+    const params = new URLSearchParams(values).toString();
 
     this.getFilteredData(params);
   }
@@ -88,34 +96,26 @@ export class Filters extends Component<Props> {
     this.props.clearFilters();
   }
 
+  getStateCategoryField = (): keyof State => {
+    if (this.props.category === 'Characters') return 'characterFilters';
+    else if (this.props.category === 'Locations') return 'locationFilters';
+
+    return 'episodeFilters';
+  };
+
   handleInputChange = (filter: string, value: string): void => {
+    const fieldToChange = this.getStateCategoryField();
+
     this.setState((prevState: State) => {
-      switch (this.props.category) {
-        case 'Characters':
-          return {
-            characterFilters: {
-              ...prevState.characterFilters,
-              [filter]: value,
-            },
-          };
-        case 'Locations':
-          return {
-            locationFilters: {
-              ...prevState.locationFilters,
-              [filter]: value,
-            },
-          };
-        case 'Episodes':
-          return {
-            episodeFilters: {
-              ...prevState.episodeFilters,
-              [filter]: value,
-            },
-          };
-        default:
-          return prevState;
-      }
+      return { ...prevState, [fieldToChange]: { ...prevState[fieldToChange], [filter]: value } };
     });
+  };
+
+  getOptionFields = (filter: string): typeof CHARACTER_STATUS_OPTIONS | typeof CHARACTER_GENDER_OPTIONS | [] => {
+    if (filter === 'status') return CHARACTER_STATUS_OPTIONS;
+    else if (filter === 'gender') return CHARACTER_GENDER_OPTIONS;
+
+    return [];
   };
 
   render(): JSX.Element {
@@ -148,13 +148,8 @@ export class Filters extends Component<Props> {
                       {characterFilters[filter]}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                      {(filter === 'status'
-                        ? CHARACTER_STATUS_OPTIONS
-                        : filter === 'gender'
-                          ? CHARACTER_GENDER_OPTIONS
-                          : []
-                      ).map((option, index) => (
-                        <Dropdown.Item key={`${index}-option`} eventKey={option}>
+                      {this.getOptionFields(filter).map((option, index) => (
+                        <Dropdown.Item key={`${index}-option-${option}`} eventKey={option}>
                           {option}
                         </Dropdown.Item>
                       ))}
@@ -206,7 +201,7 @@ export class Filters extends Component<Props> {
         <div className='d-flex flex-row justify-content-center align-items-center'>
           <div
             onClick={() => this.handleSearch()}
-            className={`btn-wrapper m-2 d-flex justify-content-center align-items-center ${!Object.values(this.getFiltersByCategory(this.props.category)).filter((val) => !!val.length).length ? 'disabled' : ''}`}
+            className={`btn-wrapper m-2 d-flex justify-content-center align-items-center ${!Object.values(this.getFiltersByCategory(this.props.category)).length ? 'disabled' : ''}`}
           >
             <div className='btn fs-6 d-flex justify-content-center align-items-center p-1 text-white'>Search</div>
           </div>

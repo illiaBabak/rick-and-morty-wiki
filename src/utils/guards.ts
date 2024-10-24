@@ -53,4 +53,8 @@ export const isEpisodeArr = (data: unknown): data is EpisodeType[] =>
 export const isResponse = (data: unknown): data is ResponseType =>
   isObj(data) &&
   'results' in data &&
-  (isCharacterArr(data.results) || isLocationArr(data.results) || isEpisodeArr(data.results));
+  (isCharacterArr(data.results) || isLocationArr(data.results) || isEpisodeArr(data.results)) &&
+  'info' in data &&
+  isObj(data.info) &&
+  'pages' in data.info &&
+  isNumber(data.info.pages);

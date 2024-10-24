@@ -22,5 +22,8 @@ export interface EpisodeType {
 }
 
 export interface ResponseType {
+  info: {
+    pages: number;
+  };
   results: CharacterType[] | LocationType[] | EpisodeType[];
 }
