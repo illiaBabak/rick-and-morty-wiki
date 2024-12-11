@@ -1,6 +1,6 @@
 export interface CharacterType {
   name: string;
-  status: string;
+  status: 'Alive' | 'Dead' | 'unknown';
   species: string;
   gender: string;
   image: string;

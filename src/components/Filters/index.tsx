@@ -1,68 +1,21 @@
 import { Component } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { CharacterType, EpisodeType, LocationType } from 'src/types/dataTypes';
 import { capitalize } from 'src/utils/capitalize';
-import { CHIPS } from 'src/utils/constants';
-import { isCharacterArr, isEpisodeArr, isLocationArr, isResponse } from 'src/utils/guards';
-
-const loadDataWithParams = async (category: string, params: string) => {
-  const response = await fetch(
-    `https://rickandmortyapi.com/api/${category.toLocaleLowerCase().slice(0, category.length - 1)}?${params}`
-  );
-
-  const data: unknown = await response.json();
-  const parsedData: unknown = isResponse(data) ? data.results : [];
-
-  return parsedData;
-};
-
-const CHARACTER_FILTERS = ['name', 'status', 'species', 'type', 'gender'] as const;
-const LOCATION_FILTERS = ['name', 'type', 'dimension'] as const;
-const EPISODES_FILTERS = ['name', 'episode'] as const;
-
-const CHARACTER_GENDER_OPTIONS = ['Unselected', 'Male', 'Female', 'unknown', 'Genderless'] as const;
-const CHARACTER_STATUS_OPTIONS = ['Unselected', 'Alive', 'Dead', 'unknown'] as const;
-
-type Filter =
-  | Record<(typeof CHARACTER_FILTERS)[number], string>
-  | Record<(typeof LOCATION_FILTERS)[number], string>
-  | Record<(typeof EPISODES_FILTERS)[number], string>;
-
-const DEFAULT_VAL = {
-  characterFilters: {
-    name: '',
-    status: 'Unselected',
-    species: '',
-    type: '',
-    gender: 'Unselected',
-  },
-  locationFilters: {
-    name: '',
-    type: '',
-    dimension: '',
-  },
-  episodeFilters: {
-    name: '',
-    episode: '',
-  },
-};
-
-interface Props {
-  category: (typeof CHIPS)[number];
-  useFilteredData: (filteredData: CharacterType[] | LocationType[] | EpisodeType[]) => void;
-  clearFilters: () => void;
-}
-
-interface State {
-  characterFilters: Record<(typeof CHARACTER_FILTERS)[number], string>;
-  locationFilters: Record<(typeof LOCATION_FILTERS)[number], string>;
-  episodeFilters: Record<(typeof EPISODES_FILTERS)[number], string>;
-}
+import { CATEGORIES } from 'src/utils/constants';
+import {
+  CHARACTER_FILTERS,
+  LOCATION_FILTERS,
+  EPISODES_FILTERS,
+  CHARACTER_STATUS_OPTIONS,
+  CHARACTER_GENDER_OPTIONS,
+  FILTERS_DEFAULT_VAL,
+} from './constants';
+import { Filter, Props, State } from './types';
 
 export class Filters extends Component<Props> {
-  state: State = DEFAULT_VAL;
+  state: State = FILTERS_DEFAULT_VAL;
 
-  getFiltersByCategory(category: (typeof CHIPS)[number]): Filter {
+  getFiltersByCategory(category: (typeof CATEGORIES)[number]): Filter {
     const filters = {
       Characters: this.state.characterFilters,
       Locations: this.state.locationFilters,
@@ -77,28 +30,24 @@ export class Filters extends Component<Props> {
     return filtersToApply;
   }
 
-  async getFilteredData(params: string): Promise<void> {
-    const filteredData = await loadDataWithParams(this.props.category, params);
-
-    if (isCharacterArr(filteredData) || isLocationArr(filteredData) || isEpisodeArr(filteredData))
-      this.props.useFilteredData(filteredData);
-  }
-
   handleSearch(): void {
     const values = Object.entries(this.getFiltersByCategory(this.props.category));
     const params = new URLSearchParams(values).toString();
 
-    this.getFilteredData(params);
+    this.props.setParams(params);
+    this.props.clearData();
   }
 
   handleClear(): void {
-    this.setState(DEFAULT_VAL);
-    this.props.clearFilters();
+    this.setState(FILTERS_DEFAULT_VAL);
+    this.props.clearData();
+    this.props.setParams('');
   }
 
   getStateCategoryField = (): keyof State => {
     if (this.props.category === 'Characters') return 'characterFilters';
-    else if (this.props.category === 'Locations') return 'locationFilters';
+
+    if (this.props.category === 'Locations') return 'locationFilters';
 
     return 'episodeFilters';
   };
@@ -111,16 +60,11 @@ export class Filters extends Component<Props> {
     });
   };
 
-  getOptionFields = (filter: string): typeof CHARACTER_STATUS_OPTIONS | typeof CHARACTER_GENDER_OPTIONS | [] => {
-    if (filter === 'status') return CHARACTER_STATUS_OPTIONS;
-    else if (filter === 'gender') return CHARACTER_GENDER_OPTIONS;
-
-    return [];
-  };
-
   render(): JSX.Element {
     const { category } = this.props;
     const { characterFilters, locationFilters, episodeFilters } = this.state;
+
+    const disabledClassName = !Object.values(this.getFiltersByCategory(this.props.category)).length ? 'disabled' : '';
 
     return (
       <div className='filters d-flex flex-column justify-content-center align-items-center w-75 mt-4 p-3 text-white'>
@@ -148,11 +92,13 @@ export class Filters extends Component<Props> {
                       {characterFilters[filter]}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                      {this.getOptionFields(filter).map((option, index) => (
-                        <Dropdown.Item key={`${index}-option-${option}`} eventKey={option}>
-                          {option}
-                        </Dropdown.Item>
-                      ))}
+                      {(filter === 'status' ? CHARACTER_STATUS_OPTIONS : CHARACTER_GENDER_OPTIONS).map(
+                        (option, index) => (
+                          <Dropdown.Item key={`${index}-option-${option}`} eventKey={option}>
+                            {option}
+                          </Dropdown.Item>
+                        )
+                      )}
                     </Dropdown.Menu>
                   </Dropdown>
                 ) : (
@@ -201,7 +147,7 @@ export class Filters extends Component<Props> {
         <div className='d-flex flex-row justify-content-center align-items-center'>
           <div
             onClick={() => this.handleSearch()}
-            className={`btn-wrapper m-2 d-flex justify-content-center align-items-center ${!Object.values(this.getFiltersByCategory(this.props.category)).length ? 'disabled' : ''}`}
+            className={`btn-wrapper m-2 d-flex justify-content-center align-items-center ${disabledClassName}`}
           >
             <div className='btn fs-6 d-flex justify-content-center align-items-center p-1 text-white'>Search</div>
           </div>

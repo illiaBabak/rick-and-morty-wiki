@@ -4,14 +4,20 @@ import { isCharacterArr, isEpisodeArr, isLocationArr, isResponse } from 'src/uti
 import { Character } from '../Character';
 import { Location } from '../Location';
 import { CharacterType, EpisodeType, LocationType, ResponseType } from 'src/types/dataTypes';
-import { CHIPS, OBSERVER_OPTIONS } from 'src/utils/constants';
 import { Episode } from '../Episode';
 import { Loader } from '../Loader';
 import { Filters } from '../Filters';
+import { State, Data } from './types';
 
-const loadData = async (category: string, pageNumber: number): Promise<ResponseType | null> => {
+export const OBSERVER_OPTIONS = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.5,
+};
+
+const loadData = async (category: string, pageNumber: number, params: string): Promise<ResponseType | null> => {
   const response = await fetch(
-    `https://rickandmortyapi.com/api/${category.toLocaleLowerCase().slice(0, category.length - 1)}?page=${pageNumber}`
+    `https://rickandmortyapi.com/api/${category.toLocaleLowerCase().slice(0, category.length - 1)}?page=${pageNumber}&${params}`
   );
 
   const data: unknown = await response.json();
@@ -20,37 +26,12 @@ const loadData = async (category: string, pageNumber: number): Promise<ResponseT
   return parsedResponse;
 };
 
-interface Data {
-  charactersData: {
-    characters: CharacterType[];
-    page: number;
-    maxPages: number;
-  };
-  locationsData: {
-    locations: LocationType[];
-    page: number;
-    maxPages: number;
-  };
-  episodesData: {
-    episodes: EpisodeType[];
-    page: number;
-    maxPages: number;
-  };
-}
-
-interface State extends Data {
-  category: (typeof CHIPS)[number];
-  isLoading: boolean;
-  initialized: boolean;
-  hasFilters: boolean;
-}
-
 class Main extends Component<RouteComponentProps> {
   state: State = {
     category: 'Characters',
     isLoading: false,
-    initialized: true,
     hasFilters: false,
+    params: '',
     charactersData: {
       characters: [],
       page: 0,
@@ -87,7 +68,7 @@ class Main extends Component<RouteComponentProps> {
 
     this.setState({ isLoading: true });
 
-    const data = await loadData('Characters', pageNumber);
+    const data = await loadData('Characters', pageNumber, this.state.params);
     const parsedData = isCharacterArr(data?.results) ? data.results : [];
 
     if (!data?.info.pages) return [[], 0];
@@ -100,7 +81,7 @@ class Main extends Component<RouteComponentProps> {
 
     this.setState({ isLoading: true });
 
-    const data = await loadData('Locations', pageNumber);
+    const data = await loadData('Locations', pageNumber, this.state.params);
     const parsedData = isLocationArr(data?.results) ? data.results : [];
 
     if (!data?.info.pages) return [[], 0];
@@ -113,7 +94,7 @@ class Main extends Component<RouteComponentProps> {
 
     this.setState({ isLoading: true });
 
-    const data = await loadData('Episodes', pageNumber);
+    const data = await loadData('Episodes', pageNumber, this.state.params);
     const parsedData = isEpisodeArr(data?.results) ? data.results : [];
 
     if (!data?.info.pages) return [[], 0];
@@ -123,12 +104,13 @@ class Main extends Component<RouteComponentProps> {
 
   getFilterToUpdate = (updatedData: CharacterType[] | LocationType[] | EpisodeType[]): keyof Data => {
     if (this.state.category === 'Characters' && isCharacterArr(updatedData)) return 'charactersData';
-    else if (this.state.category === 'Locations' && isLocationArr(updatedData)) return 'locationsData';
+
+    if (this.state.category === 'Locations' && isLocationArr(updatedData)) return 'locationsData';
 
     return 'episodesData';
   };
 
-  useFilteredData = (filteredData: CharacterType[] | LocationType[] | EpisodeType[]): void => {
+  setFilters = (filteredData: CharacterType[] | LocationType[] | EpisodeType[]): void => {
     const filterToUpdate = this.getFilterToUpdate(filteredData);
     const field = filterToUpdate.slice(0, filterToUpdate.length - 4);
 
@@ -141,7 +123,7 @@ class Main extends Component<RouteComponentProps> {
     });
   };
 
-  clearFilters = (): void => {
+  clearData = (): void => {
     this.setState({
       hasFilters: false,
       charactersData: {
@@ -244,7 +226,7 @@ class Main extends Component<RouteComponentProps> {
   componentDidUpdate(prevProps: RouteComponentProps): void {
     const { location } = this.props;
 
-    const category = new URLSearchParams(prevProps.location.search).get('category') ?? '';
+    const category = new URLSearchParams(prevProps.location.search).get('category') ?? 'Characters';
 
     if (prevProps.location.search !== location.search && ['Characters', 'Locations', 'Episodes'].includes(category))
       this.changeCategory();
@@ -265,7 +247,16 @@ class Main extends Component<RouteComponentProps> {
 
     return (
       <div className='main d-flex w-100 flex-grow-1 flex-column align-items-center'>
-        <Filters category={category} useFilteredData={this.useFilteredData} clearFilters={this.clearFilters} />
+        <Filters
+          category={category}
+          setFilters={this.setFilters}
+          clearData={this.clearData}
+          setParams={(params: string) =>
+            this.setState({
+              params,
+            })
+          }
+        />
         <div className='d-flex flex-row flex-wrap justify-content-around mt-4'>
           {category === 'Characters' &&
             characters?.map((character, index) => (

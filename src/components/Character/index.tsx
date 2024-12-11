@@ -17,10 +17,7 @@ export class Character extends Component<CharacterProps> {
           <div className='d-flex flex-column p-3 h-100 w-100'>
             <h3 className='m-0'>{character.name}</h3>
             <p className='mt-3'>
-              Status:{' '}
-              <span className={`${character.status === 'Alive' ? 'alive' : character.status === 'Dead' ? 'dead' : ''}`}>
-                {character.status}
-              </span>
+              Status: <span className={`${character.status.toLocaleLowerCase()}`}>{character.status}</span>
             </p>
             <p>Species: {character.species}</p>
             <p>Gender: {character.gender}</p>
