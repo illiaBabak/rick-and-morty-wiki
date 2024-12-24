@@ -112,8 +112,8 @@ export class Filters extends Component<Props> {
               </div>
             ))}
 
-          {category === 'Locations' &&
-            LOCATION_FILTERS.map((filter, index) => (
+          {['Locations', 'Episodes'].includes(category) &&
+            (category === 'Locations' ? LOCATION_FILTERS : EPISODES_FILTERS).map((filter, index) => (
               <div
                 className='d-flex flex-row justify-content-center align-items-center m-2 p-1'
                 key={`filter-${filter}-${index}`}
@@ -122,23 +122,11 @@ export class Filters extends Component<Props> {
                 <input
                   className='field'
                   type='text'
-                  value={locationFilters[filter]}
-                  onChange={({ currentTarget: { value } }) => this.handleInputChange(filter, value)}
-                />
-              </div>
-            ))}
-
-          {category === 'Episodes' &&
-            EPISODES_FILTERS.map((filter, index) => (
-              <div
-                className='d-flex flex-row justify-content-center align-items-center m-2 p-1'
-                key={`filter-${filter}-${index}`}
-              >
-                <p className='m-0 me-2'>{capitalize(filter)}</p>
-                <input
-                  className='field'
-                  type='text'
-                  value={episodeFilters[filter]}
+                  value={
+                    category === 'Locations'
+                      ? locationFilters[filter as (typeof LOCATION_FILTERS)[number]]
+                      : episodeFilters[filter as (typeof EPISODES_FILTERS)[number]]
+                  }
                   onChange={({ currentTarget: { value } }) => this.handleInputChange(filter, value)}
                 />
               </div>

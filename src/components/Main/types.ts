@@ -1,7 +1,10 @@
 import { CharacterType, LocationType, EpisodeType } from 'src/types/dataTypes';
 import { CATEGORIES } from 'src/utils/constants';
 
-export interface Data {
+export interface State {
+  category: (typeof CATEGORIES)[number];
+  isLoading: boolean;
+  params: string;
   charactersData: {
     characters: CharacterType[];
     page: number;
@@ -17,11 +20,4 @@ export interface Data {
     page: number;
     maxPages: number;
   };
-}
-
-export interface State extends Data {
-  category: (typeof CATEGORIES)[number];
-  isLoading: boolean;
-  params: string;
-  hasFilters: boolean;
 }

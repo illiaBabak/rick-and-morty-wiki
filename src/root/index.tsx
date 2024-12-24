@@ -22,4 +22,6 @@ class App extends Component<RouteComponentProps> {
   }
 }
 
-export default withRouter(App);
+const AppWithRouter = withRouter(App);
+
+export default AppWithRouter;

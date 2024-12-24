@@ -7,13 +7,9 @@ import { CharacterType, EpisodeType, LocationType, ResponseType } from 'src/type
 import { Episode } from '../Episode';
 import { Loader } from '../Loader';
 import { Filters } from '../Filters';
-import { State, Data } from './types';
-
-export const OBSERVER_OPTIONS = {
-  root: null,
-  rootMargin: '0px',
-  threshold: 0.5,
-};
+import { State } from './types';
+import { DEFAULT_CONTENT_DATA, MAIN_STATE_DEFAULT_VAL, OBSERVER_OPTIONS } from './constants';
+import { CATEGORIES } from 'src/utils/constants';
 
 const loadData = async (category: string, pageNumber: number, params: string): Promise<ResponseType | null> => {
   const response = await fetch(
@@ -21,33 +17,13 @@ const loadData = async (category: string, pageNumber: number, params: string): P
   );
 
   const data: unknown = await response.json();
-  const parsedResponse: ResponseType | null = isResponse(data) ? data : null;
+  const parsedResponse = isResponse(data) ? data : null;
 
   return parsedResponse;
 };
 
 class Main extends Component<RouteComponentProps> {
-  state: State = {
-    category: 'Characters',
-    isLoading: false,
-    hasFilters: false,
-    params: '',
-    charactersData: {
-      characters: [],
-      page: 0,
-      maxPages: 1,
-    },
-    locationsData: {
-      locations: [],
-      page: 0,
-      maxPages: 1,
-    },
-    episodesData: {
-      episodes: [],
-      page: 0,
-      maxPages: 1,
-    },
-  };
+  state: State = MAIN_STATE_DEFAULT_VAL;
 
   observer: IntersectionObserver | null = null;
   observerRef = createRef<HTMLDivElement>();
@@ -63,85 +39,23 @@ class Main extends Component<RouteComponentProps> {
     return dataByCategory[category] ?? 0;
   }
 
-  async getCharactersData(pageNumber: number): Promise<[CharacterType[], number]> {
-    if (this.state.isLoading) return [[], 0];
+  async getContentData(
+    pageNumber: number,
+    category: (typeof CATEGORIES)[number]
+  ): Promise<{ data: CharacterType[] | LocationType[] | EpisodeType[]; pageCount: number }> {
+    if (this.state.isLoading) return { data: [], pageCount: 0 };
 
     this.setState({ isLoading: true });
 
-    const data = await loadData('Characters', pageNumber, this.state.params);
-    const parsedData = isCharacterArr(data?.results) ? data.results : [];
+    const data = await loadData(category, pageNumber, this.state.params);
 
-    if (!data?.info.pages) return [[], 0];
+    if (!data?.info.pages) return { data: [], pageCount: 0 };
 
-    return [parsedData, data.info.pages];
+    return { data: data.results, pageCount: data.info.pages };
   }
-
-  async getLocationsData(pageNumber: number): Promise<[LocationType[], number]> {
-    if (this.state.isLoading) return [[], 0];
-
-    this.setState({ isLoading: true });
-
-    const data = await loadData('Locations', pageNumber, this.state.params);
-    const parsedData = isLocationArr(data?.results) ? data.results : [];
-
-    if (!data?.info.pages) return [[], 0];
-
-    return [parsedData, data.info.pages];
-  }
-
-  async getEpisodesData(pageNumber: number): Promise<[EpisodeType[], number]> {
-    if (this.state.isLoading) return [[], 0];
-
-    this.setState({ isLoading: true });
-
-    const data = await loadData('Episodes', pageNumber, this.state.params);
-    const parsedData = isEpisodeArr(data?.results) ? data.results : [];
-
-    if (!data?.info.pages) return [[], 0];
-
-    return [parsedData, data.info.pages];
-  }
-
-  getFilterToUpdate = (updatedData: CharacterType[] | LocationType[] | EpisodeType[]): keyof Data => {
-    if (this.state.category === 'Characters' && isCharacterArr(updatedData)) return 'charactersData';
-
-    if (this.state.category === 'Locations' && isLocationArr(updatedData)) return 'locationsData';
-
-    return 'episodesData';
-  };
-
-  setFilters = (filteredData: CharacterType[] | LocationType[] | EpisodeType[]): void => {
-    const filterToUpdate = this.getFilterToUpdate(filteredData);
-    const field = filterToUpdate.slice(0, filterToUpdate.length - 4);
-
-    this.setState({
-      hasFilters: true,
-      [filterToUpdate]: {
-        [field]: filteredData,
-        page: 0,
-      },
-    });
-  };
 
   clearData = (): void => {
-    this.setState({
-      hasFilters: false,
-      charactersData: {
-        characters: [],
-        page: 0,
-        maxPages: 1,
-      },
-      locationsData: {
-        locations: [],
-        page: 0,
-        maxPages: 1,
-      },
-      episodesData: {
-        episodes: [],
-        page: 0,
-        maxPages: 1,
-      },
-    });
+    this.setState(DEFAULT_CONTENT_DATA);
 
     this.changeCategory();
   };
@@ -151,33 +65,39 @@ class Main extends Component<RouteComponentProps> {
     const nextPage = this.getPageByCategory(category) + 1;
 
     if (category === 'Characters' && nextPage <= this.state.charactersData.maxPages) {
-      const newPageData = await this.getCharactersData(nextPage);
+      const { data, pageCount } = await this.getContentData(nextPage, category);
+
+      if (!isCharacterArr(data)) return;
 
       this.setState((prev: State) => ({
         charactersData: {
-          characters: [...prev.charactersData.characters, ...newPageData[0]],
+          characters: [...prev.charactersData.characters, ...data],
           page: nextPage,
-          maxPages: newPageData[1],
+          maxPages: pageCount,
         },
       }));
     } else if (category === 'Locations' && nextPage <= this.state.locationsData.maxPages) {
-      const newPageData = await this.getLocationsData(nextPage);
+      const { data, pageCount } = await this.getContentData(nextPage, category);
+
+      if (!isLocationArr(data)) return;
 
       this.setState((prev: State) => ({
         locationsData: {
-          locations: [...prev.locationsData.locations, ...newPageData[0]],
+          locations: [...prev.locationsData.locations, ...data],
           page: nextPage,
-          maxPages: newPageData[1],
+          maxPages: pageCount,
         },
       }));
     } else if (category === 'Episodes' && nextPage <= this.state.episodesData.maxPages) {
-      const newPageData = await this.getEpisodesData(nextPage);
+      const { data, pageCount } = await this.getContentData(nextPage, category);
+
+      if (!isEpisodeArr(data)) return;
 
       this.setState((prev: State) => ({
         episodesData: {
-          episodes: [...prev.episodesData.episodes, ...newPageData[0]],
+          episodes: [...prev.episodesData.episodes, ...data],
           page: nextPage,
-          maxPages: newPageData[1],
+          maxPages: pageCount,
         },
       }));
     }
@@ -189,7 +109,7 @@ class Main extends Component<RouteComponentProps> {
     if (this.observer) this.observer.disconnect();
 
     this.observer = new IntersectionObserver((entries) => {
-      if (!entries[0].isIntersecting || this.state.hasFilters) return;
+      if (!entries[0].isIntersecting) return;
 
       this.updatePage();
     }, OBSERVER_OPTIONS);
@@ -198,13 +118,12 @@ class Main extends Component<RouteComponentProps> {
   };
 
   changeCategory(): void {
-    const category = new URLSearchParams(location.search).get('category') ?? 'Characters';
-
     if (this.state.isLoading) return;
+
+    const category = new URLSearchParams(location.search).get('category') ?? 'Characters';
 
     this.setState({
       category,
-      hasFilters: false,
     });
 
     setTimeout(() => {
@@ -218,17 +137,17 @@ class Main extends Component<RouteComponentProps> {
       this.isInitialized = false;
     }
 
-    if (this.observerRef.current && !this.isInitialized) {
+    if (this.observerRef.current && !this.isInitialized)
       setTimeout(() => this.handleObserver(this.observerRef.current), 0);
-    }
   }
 
   componentDidUpdate(prevProps: RouteComponentProps): void {
-    const { location } = this.props;
-
     const category = new URLSearchParams(prevProps.location.search).get('category') ?? 'Characters';
 
-    if (prevProps.location.search !== location.search && ['Characters', 'Locations', 'Episodes'].includes(category))
+    if (
+      prevProps.location.search !== this.props.location.search &&
+      ['Characters', 'Locations', 'Episodes'].includes(category)
+    )
       this.changeCategory();
   }
 
@@ -249,7 +168,6 @@ class Main extends Component<RouteComponentProps> {
       <div className='main d-flex w-100 flex-grow-1 flex-column align-items-center'>
         <Filters
           category={category}
-          setFilters={this.setFilters}
           clearData={this.clearData}
           setParams={(params: string) =>
             this.setState({
@@ -279,4 +197,6 @@ class Main extends Component<RouteComponentProps> {
   }
 }
 
-export default withRouter(Main);
+const MainWithRouter = withRouter(Main);
+
+export default MainWithRouter;

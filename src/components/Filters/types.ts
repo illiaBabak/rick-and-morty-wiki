@@ -1,4 +1,3 @@
-import { CharacterType, LocationType, EpisodeType } from 'src/types/dataTypes';
 import { CATEGORIES } from 'src/utils/constants';
 import { CHARACTER_FILTERS, LOCATION_FILTERS, EPISODES_FILTERS } from './constants';
 
@@ -9,7 +8,6 @@ export type Filter = Record<
 
 export interface Props {
   category: (typeof CATEGORIES)[number];
-  setFilters: (filteredData: CharacterType[] | LocationType[] | EpisodeType[]) => void;
   clearData: () => void;
   setParams: (params: string) => void;
 }
