@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { CATEGORIES } from 'src/utils/constants';
+import { BASE_URL, CATEGORIES } from 'src/utils/constants';
 import { Link } from 'react-router-dom';
 
 export class Header extends Component {
@@ -9,7 +9,11 @@ export class Header extends Component {
         <h1>Rick and Morty wiki</h1>
         <div className='d-flex flex-row align-items-center justify-content-center'>
           {CATEGORIES.map((chip, index) => (
-            <Link className='chip m-2 p-2 text-white' to={`/?category=${chip}`} key={`link-${chip}-${index}`}>
+            <Link
+              className='chip m-2 p-2 text-white'
+              to={`${BASE_URL}/?category=${chip}`}
+              key={`link-${chip}-${index}`}
+            >
               {chip}
             </Link>
           ))}

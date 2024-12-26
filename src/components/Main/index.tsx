@@ -147,8 +147,13 @@ class Main extends Component<RouteComponentProps> {
     if (
       prevProps.location.search !== this.props.location.search &&
       ['Characters', 'Locations', 'Episodes'].includes(category)
-    )
+    ) {
       this.changeCategory();
+      this.setState({
+        params: '',
+      });
+      this.clearData();
+    }
   }
 
   componentWillUnmount() {

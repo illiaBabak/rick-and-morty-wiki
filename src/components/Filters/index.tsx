@@ -17,9 +17,9 @@ export class Filters extends Component<Props> {
 
   getFiltersByCategory(category: (typeof CATEGORIES)[number]): Filter {
     const filters = {
-      Characters: this.state.characterFilters,
-      Locations: this.state.locationFilters,
-      Episodes: this.state.episodeFilters,
+      Characters: this.state.charactersFilters,
+      Locations: this.state.locationsFilters,
+      Episodes: this.state.episodesFilters,
     };
 
     const selectedFilters = filters[category];
@@ -31,25 +31,32 @@ export class Filters extends Component<Props> {
   }
 
   handleSearch(): void {
-    const values = Object.entries(this.getFiltersByCategory(this.props.category));
-    const params = new URLSearchParams(values).toString();
+    const params = new URLSearchParams();
 
-    this.props.setParams(params);
+    const values = Object.entries(this.getFiltersByCategory(this.props.category));
+    values.forEach(([key, value]) => params.set(key, value));
+
+    this.props.setParams(params.toString());
     this.props.clearData();
+
+    const newUrl = `${window.location.pathname}?category=${this.props.category}&${params.toString()}`;
+
+    window.history.replaceState({}, '', newUrl);
   }
 
   handleClear(): void {
     this.setState(FILTERS_DEFAULT_VAL);
     this.props.clearData();
     this.props.setParams('');
+    window.history.replaceState({}, '', `${window.location.pathname}?category=${this.props.category}`);
   }
 
   getStateCategoryField = (): keyof State => {
-    if (this.props.category === 'Characters') return 'characterFilters';
+    if (this.props.category === 'Characters') return 'charactersFilters';
 
-    if (this.props.category === 'Locations') return 'locationFilters';
+    if (this.props.category === 'Locations') return 'locationsFilters';
 
-    return 'episodeFilters';
+    return 'episodesFilters';
   };
 
   handleInputChange = (filter: string, value: string): void => {
@@ -60,9 +67,13 @@ export class Filters extends Component<Props> {
     });
   };
 
+  componentDidUpdate(prevProps: Props): void {
+    if (prevProps.category !== this.props.category) this.setState(FILTERS_DEFAULT_VAL);
+  }
+
   render(): JSX.Element {
     const { category } = this.props;
-    const { characterFilters, locationFilters, episodeFilters } = this.state;
+    const { charactersFilters, locationsFilters, episodesFilters } = this.state;
 
     const disabledClassName = !Object.values(this.getFiltersByCategory(this.props.category)).length ? 'disabled' : '';
 
@@ -81,15 +92,15 @@ export class Filters extends Component<Props> {
                   <Dropdown
                     onSelect={(option) =>
                       this.setState({
-                        characterFilters: {
-                          ...characterFilters,
+                        charactersFilters: {
+                          ...charactersFilters,
                           [filter]: option,
                         },
                       })
                     }
                   >
                     <Dropdown.Toggle className='dropdown-filter d-flex justify-content-center align-items-center text-center'>
-                      {characterFilters[filter]}
+                      {charactersFilters[filter]}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                       {(filter === 'status' ? CHARACTER_STATUS_OPTIONS : CHARACTER_GENDER_OPTIONS).map(
@@ -105,7 +116,7 @@ export class Filters extends Component<Props> {
                   <input
                     className='field'
                     type='text'
-                    value={characterFilters[filter]}
+                    value={charactersFilters[filter]}
                     onChange={({ currentTarget: { value } }) => this.handleInputChange(filter, value)}
                   />
                 )}
@@ -124,8 +135,8 @@ export class Filters extends Component<Props> {
                   type='text'
                   value={
                     category === 'Locations'
-                      ? locationFilters[filter as (typeof LOCATION_FILTERS)[number]]
-                      : episodeFilters[filter as (typeof EPISODES_FILTERS)[number]]
+                      ? locationsFilters[filter as (typeof LOCATION_FILTERS)[number]]
+                      : episodesFilters[filter as (typeof EPISODES_FILTERS)[number]]
                   }
                   onChange={({ currentTarget: { value } }) => this.handleInputChange(filter, value)}
                 />
@@ -134,8 +145,12 @@ export class Filters extends Component<Props> {
         </div>
         <div className='d-flex flex-row justify-content-center align-items-center'>
           <div
-            onClick={() => this.handleSearch()}
             className={`btn-wrapper m-2 d-flex justify-content-center align-items-center ${disabledClassName}`}
+            onClick={() => {
+              if (disabledClassName) return;
+
+              this.handleSearch();
+            }}
           >
             <div className='btn fs-6 d-flex justify-content-center align-items-center p-1 text-white'>Search</div>
           </div>

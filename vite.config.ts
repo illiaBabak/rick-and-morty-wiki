@@ -4,6 +4,7 @@ import checker from 'vite-plugin-checker';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  base: '/rick-and-morty-wiki',
   build: {
     outDir: 'build',
     emptyOutDir: true,

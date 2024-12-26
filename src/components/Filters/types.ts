@@ -13,7 +13,7 @@ export interface Props {
 }
 
 export interface State {
-  characterFilters: Record<(typeof CHARACTER_FILTERS)[number], string>;
-  locationFilters: Record<(typeof LOCATION_FILTERS)[number], string>;
-  episodeFilters: Record<(typeof EPISODES_FILTERS)[number], string>;
+  charactersFilters: Record<(typeof CHARACTER_FILTERS)[number], string>;
+  locationsFilters: Record<(typeof LOCATION_FILTERS)[number], string>;
+  episodesFilters: Record<(typeof EPISODES_FILTERS)[number], string>;
 }

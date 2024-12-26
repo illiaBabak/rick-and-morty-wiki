@@ -6,19 +6,19 @@ export const CHARACTER_GENDER_OPTIONS = ['Unselected', 'Male', 'Female', 'unknow
 export const CHARACTER_STATUS_OPTIONS = ['Unselected', 'Alive', 'Dead', 'unknown'] as const;
 
 export const FILTERS_DEFAULT_VAL = {
-  characterFilters: {
+  charactersFilters: {
     name: '',
     status: 'Unselected',
     species: '',
     type: '',
     gender: 'Unselected',
   },
-  locationFilters: {
+  locationsFilters: {
     name: '',
     type: '',
     dimension: '',
   },
-  episodeFilters: {
+  episodesFilters: {
     name: '',
     episode: '',
   },
