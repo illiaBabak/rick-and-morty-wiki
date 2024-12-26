@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { Header } from 'src/components/Header';
 import Main from 'src/components/Main';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { BASE_URL } from 'src/utils/constants';
 
 class App extends Component<RouteComponentProps> {
   componentDidMount(): void {
@@ -9,7 +10,7 @@ class App extends Component<RouteComponentProps> {
 
     const categoryQuery = new URLSearchParams(location.search).get('category');
 
-    if (!categoryQuery) window.location.href = '/?category=Characters'; //set category default equales to Character
+    if (!categoryQuery) window.location.href = `${BASE_URL}/?category=Characters`; //set category default equales to Character
   }
 
   render(): JSX.Element {
