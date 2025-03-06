@@ -30,3 +30,7 @@ export const MAIN_STATE_DEFAULT_VAL: State = {
   params: '',
   ...DEFAULT_CONTENT_DATA,
 };
+
+export const DEFAULT_CATEGORY = 'Characters';
+
+export const CATEGORY_LIST = ['Characters', 'Locations', 'Episodes'];

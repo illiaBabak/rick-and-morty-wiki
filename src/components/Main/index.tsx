@@ -1,26 +1,22 @@
 import { Component, createRef } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { isCharacterArr, isEpisodeArr, isLocationArr, isResponse } from 'src/utils/guards';
+import { isCharacterArr, isEpisodeArr, isLocationArr } from 'src/utils/guards';
 import { Character } from '../Character';
 import { Location } from '../Location';
-import { CharacterType, EpisodeType, LocationType, ResponseType } from 'src/types/dataTypes';
+import { CharacterType, EpisodeType, LocationType } from 'src/types/dataTypes';
 import { Episode } from '../Episode';
 import { Loader } from '../Loader';
 import { Filters } from '../Filters';
 import { State } from './types';
-import { DEFAULT_CONTENT_DATA, MAIN_STATE_DEFAULT_VAL, OBSERVER_OPTIONS } from './constants';
+import {
+  CATEGORY_LIST,
+  DEFAULT_CATEGORY,
+  DEFAULT_CONTENT_DATA,
+  MAIN_STATE_DEFAULT_VAL,
+  OBSERVER_OPTIONS,
+} from './constants';
 import { CATEGORIES } from 'src/utils/constants';
-
-const loadData = async (category: string, pageNumber: number, params: string): Promise<ResponseType | null> => {
-  const response = await fetch(
-    `https://rickandmortyapi.com/api/${category.toLocaleLowerCase().slice(0, category.length - 1)}?page=${pageNumber}&${params}`
-  );
-
-  const data: unknown = await response.json();
-  const parsedResponse = isResponse(data) ? data : null;
-
-  return parsedResponse;
-};
+import { loadList } from 'src/api/list';
 
 class Main extends Component<RouteComponentProps> {
   state: State = MAIN_STATE_DEFAULT_VAL;
@@ -47,7 +43,7 @@ class Main extends Component<RouteComponentProps> {
 
     this.setState({ isLoading: true });
 
-    const data = await loadData(category, pageNumber, this.state.params);
+    const data = await loadList(category, pageNumber, this.state.params);
 
     if (!data?.info.pages) return { data: [], pageCount: 0 };
 
@@ -56,8 +52,6 @@ class Main extends Component<RouteComponentProps> {
 
   clearData = (): void => {
     this.setState(DEFAULT_CONTENT_DATA);
-
-    this.changeCategory();
   };
 
   async updatePage() {
@@ -120,10 +114,11 @@ class Main extends Component<RouteComponentProps> {
   changeCategory(): void {
     if (this.state.isLoading) return;
 
-    const category = new URLSearchParams(location.search).get('category') ?? 'Characters';
+    const category = new URLSearchParams(location.search).get('category') ?? DEFAULT_CATEGORY;
 
     this.setState({
       category,
+      params: '',
     });
 
     setTimeout(() => {
@@ -142,16 +137,10 @@ class Main extends Component<RouteComponentProps> {
   }
 
   componentDidUpdate(prevProps: RouteComponentProps): void {
-    const category = new URLSearchParams(prevProps.location.search).get('category') ?? 'Characters';
+    const category = new URLSearchParams(prevProps.location.search).get('category') ?? DEFAULT_CATEGORY;
 
-    if (
-      prevProps.location.search !== this.props.location.search &&
-      ['Characters', 'Locations', 'Episodes'].includes(category)
-    ) {
+    if (prevProps.location.search !== this.props.location.search && CATEGORY_LIST.includes(category)) {
       this.changeCategory();
-      this.setState({
-        params: '',
-      });
       this.clearData();
     }
   }

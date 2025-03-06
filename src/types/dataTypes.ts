@@ -21,7 +21,7 @@ export interface EpisodeType {
   episode: string;
 }
 
-export interface ResponseType {
+export interface ListResponse {
   info: {
     pages: number;
   };

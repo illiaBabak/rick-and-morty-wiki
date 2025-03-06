@@ -1,4 +1,4 @@
-import { CharacterType, EpisodeType, LocationType, ResponseType } from 'src/types/dataTypes';
+import { CharacterType, EpisodeType, LocationType, ListResponse } from 'src/types/dataTypes';
 
 const isNumber = (data: unknown): data is number => typeof data === 'number';
 
@@ -50,7 +50,7 @@ const isEpisode = (data: unknown): data is EpisodeType =>
 export const isEpisodeArr = (data: unknown): data is EpisodeType[] =>
   Array.isArray(data) && data.every((el) => isEpisode(el));
 
-export const isResponse = (data: unknown): data is ResponseType =>
+export const isListResponse = (data: unknown): data is ListResponse =>
   isObj(data) &&
   'results' in data &&
   (isCharacterArr(data.results) || isLocationArr(data.results) || isEpisodeArr(data.results)) &&
