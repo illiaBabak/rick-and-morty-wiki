@@ -35,6 +35,6 @@ To run this project locally you need tsconfig.json, tsconfig.node.json, .prettie
 
 # Link to try a project
 
-https://illiababak.github.io/rick-and-morty-wiki/
+https://rick-and-morty-wiki-alpha.vercel.app
 
 </div>
