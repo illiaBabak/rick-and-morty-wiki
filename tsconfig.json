@@ -14,7 +14,7 @@
       "src/*": ["./src/*"]
     },
     "jsx": "react-jsx",
-    "lib": ["es5", "es6", "dom", "dom.iterable"]
+    "lib": ["es5", "es6", "dom", "dom.iterable", "ES2020"]
   },
   "include": ["src/**/*", "cypress"],
   "exclude": ["node_modules"]

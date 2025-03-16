@@ -1,4 +1,4 @@
-import { Component, ReactNode } from 'react';
+import { Component, ReactNode, JSX } from 'react';
 
 interface CardWrapperProps {
   children: ReactNode;

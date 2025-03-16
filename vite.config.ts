@@ -12,7 +12,14 @@ export default defineConfig({
     open: true,
     port: 3000,
   },
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern',
+        silenceDeprecations: ['import'],
+      },
+    },
+  },
   plugins: [react(), eslint(), checker({ typescript: true })],
   resolve: {
     alias: {

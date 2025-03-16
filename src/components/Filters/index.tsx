@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, JSX } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { capitalize } from 'src/utils/capitalize';
 import { CATEGORIES } from 'src/utils/constants';

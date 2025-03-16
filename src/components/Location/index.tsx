@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, JSX } from 'react';
 import { LocationType } from 'src/types/dataTypes';
 import { CardWrapper } from '../CardWrapper';
 

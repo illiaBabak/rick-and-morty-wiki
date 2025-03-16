@@ -5,22 +5,19 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import cypress from 'eslint-plugin-cypress';
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'node_modules', 'build'] },
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
         ...globals.browser,
-        ...globals.mocha,
-        cy: 'readonly',
       },
       parser: tsParser,
       parserOptions: {
-        ecmaVersion: 'latest',
+        ecmaVersion: 2020,
         sourceType: 'module',
         jsx: true,
       },
@@ -33,7 +30,6 @@ export default [
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       '@typescript-eslint': tsPlugin,
-      cypress: cypress,
     },
     rules: {
       ...js.configs.recommended.rules,
@@ -51,6 +47,7 @@ export default [
       'prefer-const': 'error',
       'no-var': 'error',
       'react/jsx-no-target-blank': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
     },
   },
 ];

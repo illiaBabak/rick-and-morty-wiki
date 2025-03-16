@@ -1,4 +1,4 @@
-import { Component, createRef } from 'react';
+import { Component, createRef, JSX } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { isCharacterArr, isEpisodeArr, isLocationArr } from 'src/utils/guards';
 import { Character } from '../Character';

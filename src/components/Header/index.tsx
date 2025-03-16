@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, JSX } from 'react';
 import { CATEGORIES } from 'src/utils/constants';
 import { Link } from 'react-router-dom';
 import { routes } from 'src/config/routes';

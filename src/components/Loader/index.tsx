@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, JSX } from 'react';
 
 export class Loader extends Component {
   render(): JSX.Element {

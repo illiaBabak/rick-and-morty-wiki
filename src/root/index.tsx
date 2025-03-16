@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, JSX } from 'react';
 import { BrowserRouter, Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
 import { routes } from 'src/config/routes';
 import MainPageWithRouter from 'src/pages/MainPage';

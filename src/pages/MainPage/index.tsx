@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, JSX } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { Header } from 'src/components/Header';
 import Main from 'src/components/Main';
