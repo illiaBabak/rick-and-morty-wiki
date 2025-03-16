@@ -24,8 +24,4 @@ build
 *.sln
 *.sw?
 .eslintrc
-.prettierrc
 .env
-tsconfig.json
-tsconfig.node.json
-eslint.config.js
