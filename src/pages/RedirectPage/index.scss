@@ -1,0 +1,27 @@
+.redirect-page {
+  background: url('https://storage.googleapis.com/pod_public/1300/115643.jpg');
+  background-size: 600px 300px;
+  background-repeat: repeat;
+
+  .window {
+    width: 320px;
+    border: 6px solid rgb(182, 244, 146);
+    background-color: #282932;
+
+    .redirect-btn {
+      background-color: #282932;
+      color: white;
+      border: 2px solid rgb(182, 244, 146);
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        background-color: rgb(182, 244, 146);
+        color: #282932;
+      }
+    }
+  }
+}

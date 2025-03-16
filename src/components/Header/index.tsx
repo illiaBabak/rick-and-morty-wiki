@@ -1,6 +1,7 @@
 import { Component } from 'react';
-import { BASE_URL, CATEGORIES } from 'src/utils/constants';
+import { CATEGORIES } from 'src/utils/constants';
 import { Link } from 'react-router-dom';
+import { routes } from 'src/config/routes';
 
 export class Header extends Component {
   render(): JSX.Element {
@@ -11,7 +12,7 @@ export class Header extends Component {
           {CATEGORIES.map((chip, index) => (
             <Link
               className='chip m-2 p-2 text-white'
-              to={`${BASE_URL}/?category=${chip}`}
+              to={`${routes.mainPage}/?category=${chip}`}
               key={`link-${chip}-${index}`}
             >
               {chip}

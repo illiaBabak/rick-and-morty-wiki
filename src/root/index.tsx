@@ -1,24 +1,29 @@
 import { Component } from 'react';
-import { Header } from 'src/components/Header';
-import Main from 'src/components/Main';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
+import { routes } from 'src/config/routes';
+import MainPageWithRouter from 'src/pages/MainPage';
+import RedirectPageWithRouter from 'src/pages/RedirectPage';
 import { BASE_URL } from 'src/utils/constants';
 
 class App extends Component<RouteComponentProps> {
-  componentDidMount(): void {
-    const { location } = this.props;
-
-    const categoryQuery = new URLSearchParams(location.search).get('category');
-
-    if (!categoryQuery) window.location.href = `${BASE_URL}/?category=Characters`; //set category default equales to Character
-  }
-
   render(): JSX.Element {
+    const { mainPage, redirectPage } = routes;
+
     return (
-      <div className='app-container d-flex justify-content-start flex-column w-100 h-100'>
-        <Header />
-        <Main />
-      </div>
+      <BrowserRouter basename={BASE_URL}>
+        <Switch>
+          <Route path='/' exact>
+            <Redirect to={mainPage} />
+          </Route>
+
+          <Route exact path={mainPage} component={MainPageWithRouter} />
+          <Route path={redirectPage} component={RedirectPageWithRouter} />
+
+          <Route path='*'>
+            <Redirect to={redirectPage} />
+          </Route>
+        </Switch>
+      </BrowserRouter>
     );
   }
 }

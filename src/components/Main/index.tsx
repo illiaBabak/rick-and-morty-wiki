@@ -17,6 +17,7 @@ import {
 } from './constants';
 import { CATEGORIES } from 'src/utils/constants';
 import { loadList } from 'src/api/list';
+import { routes } from 'src/config/routes';
 
 class Main extends Component<RouteComponentProps> {
   state: State = MAIN_STATE_DEFAULT_VAL;
@@ -43,11 +44,18 @@ class Main extends Component<RouteComponentProps> {
 
     this.setState({ isLoading: true });
 
-    const data = await loadList(category, pageNumber, this.state.params);
+    try {
+      const data = await loadList(category, pageNumber, this.state.params);
 
-    if (!data?.info.pages) return { data: [], pageCount: 0 };
+      if (!data?.info.pages) return { data: [], pageCount: 0 };
 
-    return { data: data.results, pageCount: data.info.pages };
+      return { data: data.results, pageCount: data.info.pages };
+    } catch {
+      this.props.history.push(routes.redirectPage);
+      return { data: [], pageCount: 0 };
+    } finally {
+      this.setState({ isLoading: false });
+    }
   }
 
   clearData = (): void => {
@@ -95,8 +103,6 @@ class Main extends Component<RouteComponentProps> {
         },
       }));
     }
-
-    this.setState({ isLoading: false });
   }
 
   handleObserver = (el: HTMLElement | null) => {
