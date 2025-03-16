@@ -3,14 +3,13 @@ import { BrowserRouter, Redirect, Route, RouteComponentProps, Switch, withRouter
 import { routes } from 'src/config/routes';
 import MainPageWithRouter from 'src/pages/MainPage';
 import RedirectPageWithRouter from 'src/pages/RedirectPage';
-import { BASE_URL } from 'src/utils/constants';
 
 class App extends Component<RouteComponentProps> {
   render(): JSX.Element {
     const { mainPage, redirectPage } = routes;
 
     return (
-      <BrowserRouter basename={BASE_URL}>
+      <BrowserRouter>
         <Switch>
           <Route path='/' exact>
             <Redirect to={mainPage} />

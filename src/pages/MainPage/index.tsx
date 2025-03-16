@@ -4,7 +4,6 @@ import { Header } from 'src/components/Header';
 import Main from 'src/components/Main';
 import { CATEGORY_LIST } from 'src/components/Main/constants';
 import { routes } from 'src/config/routes';
-import { BASE_URL } from 'src/utils/constants';
 
 class MainPage extends Component<RouteComponentProps> {
   componentDidMount(): void {
@@ -14,7 +13,7 @@ class MainPage extends Component<RouteComponentProps> {
 
     if (category && !CATEGORY_LIST.includes(category)) this.props.history.push(routes.redirectPage);
 
-    if (!category) window.location.href = `${BASE_URL}${routes.mainPage}?category=Characters`; //set category default equales to Character
+    if (!category) window.location.href = `${routes.mainPage}?category=Characters`; //set category default equales to Character
   }
 
   render(): JSX.Element {
